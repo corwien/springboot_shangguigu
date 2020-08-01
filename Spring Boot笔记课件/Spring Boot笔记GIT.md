@@ -1184,7 +1184,7 @@ SpringBoot：底层是Spring框架，Spring框架默认是用JCL；‘
 
 ### 1、如何在系统中使用SLF4j   https://www.slf4j.org
 
-以后开发的时候，日志记录方法的调用，不应该来直接调用日志的实现类，而是调用日志抽象层里面的方法；
+以后开发的时候，日志记录方法的调用，**不应该来直接调用日志的实现类，而是调用日志抽象层里面的方法**；
 
 给系统里面导入slf4j的jar和  logback的实现jar
 
@@ -1303,7 +1303,8 @@ SpringBoot默认帮我们配置好了日志；
 
 		//日志的级别；
 		//由低到高   trace<debug<info<warn<error
-		//可以调整输出的日志级别；日志就只会在这个级别以以后的高级别生效
+		//可以调整输出的日志级别；日志就只会在这个级别以以后的高级别生效，
+    //在application.properties调整日志打印级别： logging.level.com.guigu=trace
 		logger.trace("这是trace日志...");
 		logger.debug("这是debug日志...");
 		//SpringBoot默认给我们使用的是info级别的，没有指定级别的就用SpringBoot默认规定的级别；root级别
@@ -1346,11 +1347,11 @@ logging.pattern.console=%d{yyyy-MM-dd} [%thread] %-5level %logger{50} - %msg%n
 logging.pattern.file=%d{yyyy-MM-dd} === [%thread] === %-5level === %logger{50} ==== %msg%n
 ```
 
-| logging.file | logging.path | Example  | Description             |
-| ------------ | ------------ | -------- | ----------------------- |
-| (none)       | (none)       |          | 只在控制台输出                 |
-| 指定文件名        | (none)       | my.log   | 输出日志到my.log文件           |
-| (none)       | 指定目录         | /var/log | 输出到指定目录的 spring.log 文件中 |
+| logging.file | logging.path | Example  | Description                        |
+| ------------ | ------------ | -------- | ---------------------------------- |
+| (none)       | (none)       |          | **只在控制台输出**                 |
+| 指定文件名   | (none)       | my.log   | 输出日志到my.log文件               |
+| (none)       | 指定目录     | /var/log | 输出到指定目录的 spring.log 文件中 |
 
 ### 2、指定配置
 
