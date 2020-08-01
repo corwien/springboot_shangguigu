@@ -1,13 +1,13 @@
-package com.guigu.springboot02config;
+package com.guigu.springboot;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class SpringBoot02ConfigApplication {
+public class SpringBoot02ConfigAutoconfigApplication {
 
   public static void main(String[] args) {
-    SpringApplication.run(SpringBoot02ConfigApplication.class, args);
+    SpringApplication.run(SpringBoot02ConfigAutoconfigApplication.class, args);
   }
 
 }

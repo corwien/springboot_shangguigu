@@ -1,10 +1,10 @@
-package com.guigu.springboot02config;
+package com.guigu.springboot;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class SpringBoot02ConfigApplicationTests {
+class SpringBoot02ConfigAutoconfigApplicationTests {
 
   @Test
   void contextLoads() {
