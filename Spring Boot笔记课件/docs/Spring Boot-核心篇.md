@@ -1,4 +1,4 @@
-# **一、**Spring Boot 入门
+# 		**一、**Spring Boot 入门
 
 ## 1、Spring Boot 简介
 
@@ -26,19 +26,13 @@
 
 ## 3、环境准备
 
-http://www.gulixueyuan.com/ 谷粒学院
-
 环境约束
 
 –jdk1.8：Spring Boot 推荐jdk1.7及以上；java version "1.8.0_112"
 
 –maven3.x：maven 3.3以上版本；Apache Maven 3.3.9
 
-–IntelliJIDEA2017：IntelliJ IDEA 2017.2.2 x64、STS
-
-–SpringBoot 1.5.9.RELEASE：1.5.9；
-
-统一环境；
+–SpringBoot 2.2.6.RELEASE：2.2.6
 
 
 
@@ -238,7 +232,7 @@ public @interface SpringBootApplication {
 
 ​		@**Configuration**:配置类上来标注这个注解；
 
-​			配置类 -----  配置文件；**配置类也是容器中的一个组件**；@Component
+​			配置类 -----  配置文件；配置类也是容器中的一个组件；@Component
 
 
 
@@ -278,13 +272,9 @@ public @interface EnableAutoConfiguration {
 
 ==Spring Boot在启动的时候从类路径下的META-INF/spring.factories中获取EnableAutoConfiguration指定的值，将这些值作为自动配置类导入到容器中，自动配置类就生效，帮我们进行自动配置工作；==以前我们需要自己配置的东西，自动配置类都帮我们；
 
-J2EE的整体整合解决方案和自动配置都在`spring-boot-autoconfigure-1.5.9.RELEASE.jar`；
+J2EE的整体整合解决方案和自动配置都在spring-boot-autoconfigure-1.5.9.RELEASE.jar；
 
 
-
-​		
-
-==Spring注解版（谷粒学院）==
 
 
 
@@ -434,7 +424,9 @@ pets: [cat,dog,pig]
 
 ## 3、配置文件值注入
 
-yaml配置文件
+在进行配置文件注入时，会同时加载application.properties和yml，不过properties的优先级更高，properties中没有配置的内容会使用yml的配置。
+
+yml配置文件
 
 ```yaml
 person:
@@ -450,6 +442,25 @@ person:
       name: 小狗
       age: 12
 ```
+
+properties配置文件
+
+```pro
+person.last_name=张三
+person.age=18
+person.boss=true
+person.birth=2010/01/01
+person.maps.k1=mmm
+person.maps.v1=aaa
+person.maps.k2=dog
+person.maps.v2.dog.name=xiaobei
+person.maps.v2.dog.age=3
+person.lists={abc,def,ghi}
+person.dog.name=wangcai
+person.dog.age=4
+```
+
+
 
 javaBean：
 
@@ -490,30 +501,6 @@ public class Person {
 		</dependency>
 ```
 
-
-
-properties配置文件
-
-```properties
-#server.port=8081
-
-# 配置person的值
-person.last-name=刘德华
-person.age=12
-person.birth=2001/12/09
-person.boss=false
-person.maps.k1=1
-person.maps.k2=2
-person.lists=a,b,c
-person.dog.name=dog
-person.dog.age=2
-
-```
-
-可以将yaml的配置文件中person删除，然后直接使用 resources/application.properties 文件的配置，可以看到同样的效果。
-
-
-
 #### 1、properties配置文件在idea中默认utf-8可能会乱码
 
 调整
@@ -529,6 +516,20 @@ person.dog.age=2
 | SpEL       | 不支持                      | 支持     |
 | JSR303数据校验 | 支持                       | 不支持    |
 | 复杂类型封装     | 支持                       | 不支持    |
+
+* 松散绑定：属性匹配规则
+
+  ​	标准方式  person.firstName 
+
+  ​	方式一 大写用-     person.first-name 
+
+  ​	方式二  大写用_    person.first_name
+
+* SpEL: `#{表达式}` 表达式内可以使用各类运算符
+
+* JSR303数据校验： 对属性的格式校验，校验时在类上要标注@Validated，对字段的校验常见的有@Email(是否是合法的邮件地址)、@NotNull(是否非空)等
+
+* 复杂类型：比如map、类等
 
 配置文件yml还是properties他们都能获取到值；
 
@@ -612,7 +613,9 @@ public class Person {
 
 Spring Boot里面没有Spring的配置文件，我们自己编写的配置文件，也不能自动识别；
 
-想让Spring的配置文件生效，加载进来；@**ImportResource**标注在一个配置类上
+想让Spring的配置文件生效，加载进来；@**ImportResource**标注在一个**配置类**上
+
+并且在beans.xml中配置的类不能再用properties和yml进行注入
 
 ```java
 @ImportResource(locations = {"classpath:beans.xml"})
@@ -658,53 +661,6 @@ public class MyAppConfig {
     }
 }
 ```
-
-
-
-单元测试
-
-```java
-package com.guigu.springboot;
-
-import com.guigu.springboot.bean.Person;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.ApplicationContext;
-
-@SpringBootTest
-class SpringBoot02ConfigApplicationTests {
-
-  @Autowired
-  Person person;
-
-  @Autowired
-  ApplicationContext ioc;
-
-  @Test
-  void testHelloService(){
-    boolean b = ioc.containsBean("helloService");
-    System.out.println(b);
-  }
-  
-   @Test
-  void testHelloService02(){
-    boolean b = ioc.containsBean("helloService02");
-    System.out.println(b);
-  }
-
-  @Test
-  void contextLoads() {
-    System.out.println(person);
-  }
-
-}
-
-```
-
-
-
-
 
 ##4、配置文件占位符
 
@@ -787,7 +743,7 @@ spring:
 
 ​		-Dspring.profiles.active=dev
 
-
+​	4、激活优先使用多profile文件，如果指定的环境在多profile没有配置，才会使用多文档块中的内容
 
 ## 6、配置文件加载位置
 
@@ -873,7 +829,7 @@ java -jar spring-boot-02-config-02-0.0.1-SNAPSHOT.jar --server.port=8087  --serv
 
 ### 1、**自动配置原理：**
 
-1）、SpringBoot启动的时候加载主配置类，开启了自动配置功能 ==@EnableAutoConfiguration==
+1）、SpringBoot启动的时候加载主配置类，开启了自动配置功能**@EnableAutoConfiguration**
 
 **2）、@EnableAutoConfiguration 作用：**
 
@@ -1184,7 +1140,7 @@ SpringBoot：底层是Spring框架，Spring框架默认是用JCL；‘
 
 ### 1、如何在系统中使用SLF4j   https://www.slf4j.org
 
-以后开发的时候，日志记录方法的调用，**不应该来直接调用日志的实现类，而是调用日志抽象层里面的方法**；
+以后开发的时候，日志记录方法的调用，不应该来直接调用日志的实现类，而是调用日志抽象层里面的方法；
 
 给系统里面导入slf4j的jar和  logback的实现jar
 
@@ -1303,8 +1259,7 @@ SpringBoot默认帮我们配置好了日志；
 
 		//日志的级别；
 		//由低到高   trace<debug<info<warn<error
-		//可以调整输出的日志级别；日志就只会在这个级别以以后的高级别生效，
-    //在application.properties调整日志打印级别： logging.level.com.guigu=trace
+		//可以调整输出的日志级别；日志就只会在这个级别以以后的高级别生效
 		logger.trace("这是trace日志...");
 		logger.debug("这是debug日志...");
 		//SpringBoot默认给我们使用的是info级别的，没有指定级别的就用SpringBoot默认规定的级别；root级别
@@ -1347,11 +1302,11 @@ logging.pattern.console=%d{yyyy-MM-dd} [%thread] %-5level %logger{50} - %msg%n
 logging.pattern.file=%d{yyyy-MM-dd} === [%thread] === %-5level === %logger{50} ==== %msg%n
 ```
 
-| logging.file | logging.path | Example  | Description                        |
-| ------------ | ------------ | -------- | ---------------------------------- |
-| (none)       | (none)       |          | **只在控制台输出**                 |
-| 指定文件名   | (none)       | my.log   | 输出日志到my.log文件               |
-| (none)       | 指定目录     | /var/log | 输出到指定目录的 spring.log 文件中 |
+| logging.file | logging.path | Example  | Description             |
+| ------------ | ------------ | -------- | ----------------------- |
+| (none)       | (none)       |          | 只在控制台输出                 |
+| 指定文件名        | (none)       | my.log   | 输出日志到my.log文件           |
+| (none)       | 指定目录         | /var/log | 输出到指定目录的 spring.log 文件中 |
 
 ### 2、指定配置
 
@@ -1490,10 +1445,23 @@ xxxxProperties:配置类来封装配置文件的内容；
 
 ## 2、SpringBoot对静态资源的映射规则；
 
+ResourceProperties定义了静态资源的访问路径，还可以设置和静态资源有关的参数，缓存时间等
+
 ```java
 @ConfigurationProperties(prefix = "spring.resources", ignoreUnknownFields = false)
 public class ResourceProperties implements ResourceLoaderAware {
-  //可以设置和静态资源有关的参数，缓存时间等
+    //静态资源的访问路径
+    private static final String[] CLASSPATH_RESOURCE_LOCATIONS = { "classpath:/META-INF/resources/",
+			"classpath:/resources/", "classpath:/static/", "classpath:/public/" };
+
+	/**
+	 * Locations of static resources. Defaults to classpath:[/META-INF/resources/,
+	 * /resources/, /static/, /public/].
+	 */
+	private String[] staticLocations = CLASSPATH_RESOURCE_LOCATIONS;
+    
+    
+  //还可以设置和静态资源有关的参数，缓存时间等
 ```
 
 
@@ -1568,7 +1536,7 @@ public class ResourceProperties implements ResourceLoaderAware {
 
 
 
-==1）、所有 /webjars/** ，都去 classpath:/META-INF/resources/webjars/ 找资源；==
+1）、所有 /webjars/** ，都去 classpath:/META-INF/resources/webjars/ 找资源；
 
 ​	webjars：以jar包的方式引入静态资源；
 
@@ -1589,7 +1557,7 @@ localhost:8080/webjars/jquery/3.3.1/jquery.js
 
 
 
-==2）、"/**" 访问当前项目的任何资源，都去（静态资源的文件夹）找映射==
+2）、"/**" 访问当前项目的任何资源，都去（静态资源的文件夹）找映射
 
 ```
 "classpath:/META-INF/resources/", 
@@ -1599,33 +1567,15 @@ localhost:8080/webjars/jquery/3.3.1/jquery.js
 "/"：当前项目的根路径
 ```
 
-localhost:8080/abc ===  去静态资源文件夹里面找abc
+localhost:8080/abc：去静态资源文件夹里面找abc
 
-==3）、欢迎页； 静态资源文件夹下的所有index.html页面；被"/**"映射；==
+如果想要修改静态资源文件夹路径，可以在properties文件中配置`spring.resources.static-locations`属性指定，指定之后默认文件夹会失效。
+
+3）、欢迎页； 静态资源文件夹下的所有index.html页面；被"/**"映射；
 
 ​	localhost:8080/   找index页面
 
-==4）、所有的 **/favicon.ico  都是在静态资源文件下找；==
-
-==5）、也可以在配置文件中自定义静态资源文件目录
-
-application.properties
-
-```
-spring.resources.static-locations=classpath:/hello/,classpath:/atguigu/
-```
-
-
-
-相关引用：
-
-将静态资源 `asserts/js/Chart.min.js` 引入到 `src/main/resources/static/` 目录下，然后访问静态资源：
-
-```
-http://localhost:8080/asserts/js/Chart.min.js
-```
-
-
+4）、所有的 **/favicon.ico  都是在静态资源文件下找（如果替换之后不生效可在浏览器ctrl+f5刷新）；
 
 
 
@@ -1689,16 +1639,6 @@ public class ThymeleafProperties {
 ```
 
 2、使用thymeleaf语法；
-
-```java
-@RequestMapping("/success")
-public String success(Map<String, Object> map){
-    map.put("hello", "<h1>你好</h1>");
-    return "success";
-  }
-```
-
-
 
 ```html
 <!DOCTYPE html>
@@ -1801,6 +1741,8 @@ Special tokens:
 
 ## 4、SpringMVC自动配置
 
+
+
 https://docs.spring.io/spring-boot/docs/1.5.10.RELEASE/reference/htmlsingle/#boot-features-developing-web-applications
 
 ### 1. Spring MVC auto-configuration
@@ -1876,20 +1818,17 @@ If you want to take complete control of Spring MVC, you can add your own `@Confi
     </mvc:interceptors>
 ```
 
-**==编写一个配置类（@Configuration），是WebMvcConfigurerAdapter类型；不能标注@EnableWebMvc==**;
+**编写一个配置类（@Configuration），实现接口WebMvcConfigurer；不能标注@EnableWebMvc**;
 
 既保留了所有的自动配置，也能用我们扩展的配置；
 
 ```java
-//使用WebMvcConfigurerAdapter可以来扩展SpringMVC的功能
+//使用WebMvcConfigurer可以来扩展SpringMVC的功能
 @Configuration
-public class MyMvcConfig extends WebMvcConfigurerAdapter {
-
+public class MyMvcConfig implements WebMvcConfigurer {
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
-       // super.addViewControllers(registry);
-        //浏览器发送 /atguigu 请求来到 success
-        registry.addViewController("/atguigu").setViewName("success");
+        registry.addViewController("/config").setViewName("success");
     }
 }
 ```
@@ -1898,26 +1837,58 @@ public class MyMvcConfig extends WebMvcConfigurerAdapter {
 
 ​	1）、WebMvcAutoConfiguration是SpringMVC的自动配置类
 
-​	2）、在做其他自动配置时会导入；@Import(**EnableWebMvcConfiguration**.class)
+​	2）、在做其他自动配置时会导入；WebMvcAutoConfiguration的内部类中有@Import(**EnableWebMvcConfiguration**.class)
 
 ```java
-    @Configuration
-	public static class EnableWebMvcConfiguration extends DelegatingWebMvcConfiguration {
-      private final WebMvcConfigurerComposite configurers = new WebMvcConfigurerComposite();
+	@Configuration(proxyBeanMethods = false)
+	@Import(EnableWebMvcConfiguration.class)
+	@EnableConfigurationProperties({ WebMvcProperties.class, ResourceProperties.class })
+	@Order(0)
+	public static class WebMvcAutoConfigurationAdapter implements WebMvcConfigurer {
+        
+-----------------------------------------------------------------------------------------
+   
+    @Configuration(proxyBeanMethods = false)
+	public static class EnableWebMvcConfiguration extends DelegatingWebMvcConfiguration implements ResourceLoaderAware {
+        
+-----------------------------------------------------------------------------------------
+    
+    @Configuration(proxyBeanMethods = false)
+public class DelegatingWebMvcConfiguration extends WebMvcConfigurationSupport {
 
-	 //从容器中获取所有的WebMvcConfigurer
-      @Autowired(required = false)
-      public void setConfigurers(List<WebMvcConfigurer> configurers) {
-          if (!CollectionUtils.isEmpty(configurers)) {
-              this.configurers.addWebMvcConfigurers(configurers);
-            	//一个参考实现；将所有的WebMvcConfigurer相关配置都来一起调用；  
-            	@Override
-             // public void addViewControllers(ViewControllerRegistry registry) {
-              //    for (WebMvcConfigurer delegate : this.delegates) {
-               //       delegate.addViewControllers(registry);
-               //   }
-              }
-          }
+	private final WebMvcConfigurerComposite configurers = new WebMvcConfigurerComposite();
+
+
+	@Autowired(required = false)
+	public void setConfigurers(List<WebMvcConfigurer> configurers) {
+		if (!CollectionUtils.isEmpty(configurers)) {
+			this.configurers.addWebMvcConfigurers(configurers);
+		}
+	}
+    
+    @Override
+	protected void addViewControllers(ViewControllerRegistry registry) {
+		this.configurers.addViewControllers(registry);
+	}
+    
+-----------------------------------------------------------------------------------------
+    
+class WebMvcConfigurerComposite implements WebMvcConfigurer {
+
+	private final List<WebMvcConfigurer> delegates = new ArrayList<>();
+
+
+	public void addWebMvcConfigurers(List<WebMvcConfigurer> configurers) {
+		if (!CollectionUtils.isEmpty(configurers)) {
+			this.delegates.addAll(configurers);
+		}
+	}
+    
+    @Override
+	public void addViewControllers(ViewControllerRegistry registry) {
+		for (WebMvcConfigurer delegate : this.delegates) {
+			delegate.addViewControllers(registry);
+		}
 	}
 ```
 
@@ -1993,7 +1964,7 @@ public class WebMvcAutoConfiguration {
 
 ​	1）、SpringBoot在自动配置很多组件的时候，先看容器中有没有用户自己配置的（@Bean、@Component）如果有就用用户配置的，如果没有，才自动配置；如果有些组件可以有多个（ViewResolver）将用户配置的和自己默认的组合起来；
 
-​	2）、在SpringBoot中会有非常多的xxxConfigurer帮助我们进行扩展配置
+​	2）、在SpringBoot中会有非常多的xxxConfigurer帮助我们进行扩展配置 ==
 
 ​	3）、在SpringBoot中会有很多的xxxCustomizer帮助我们进行定制配置
 
@@ -2007,14 +1978,16 @@ public class WebMvcAutoConfiguration {
 //@EnableWebMvc   不要接管SpringMVC
 @Configuration
 public class MyMvcConfig extends WebMvcConfigurerAdapter {
-
+	
+    //第一种导入组件的方式
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
        // super.addViewControllers(registry);
         //浏览器发送 /atguigu 请求来到 success
         registry.addViewController("/atguigu").setViewName("success");
     }
-
+	
+    //第二种导入组件的方式
     //所有的WebMvcConfigurerAdapter组件都会一起起作用
     @Bean //将组件注册在容器
     public WebMvcConfigurerAdapter webMvcConfigurerAdapter(){
@@ -2049,13 +2022,11 @@ public class MyMvcConfig extends WebMvcConfigurerAdapter {
 
 
 
-IDEA在国际化视图中会自动识别相关文件
+2）、SpringBoot自动配置好了管理国际化资源文件的组件，需要在spring配置文件中指定国际化配置文件的位置；
 
-![](images/i18n_838.png)
-
-
-
-2）、SpringBoot自动配置好了管理国际化资源文件的组件；
+```properties
+spring.messages.basename=i18n/login
+```
 
 ```java
 @ConfigurationProperties(prefix = "spring.messages")
@@ -2143,7 +2114,18 @@ public class MessageSourceAutoConfiguration {
 
 ​	国际化Locale（区域信息对象）；LocaleResolver（获取区域信息对象）；
 
+​	如果设置了spring.mvc.locale属性且设置为固定解析，并且则使用固定属性，否则默认从请求头中获取。
+
+```properties
+#设置locale区域信息
+spring.mvc.locale=en_US
+spring.mvc.locale-resolver=fixed
+```
+
+
+
 ```java
+public class WebMvcAutoConfiguration {
 		@Bean
 		@ConditionalOnMissingBean
 		@ConditionalOnProperty(prefix = "spring.mvc", name = "locale")
@@ -2156,10 +2138,40 @@ public class MessageSourceAutoConfiguration {
 			localeResolver.setDefaultLocale(this.mvcProperties.getLocale());
 			return localeResolver;
 		}
-默认的就是根据请求头带来的区域信息获取Locale进行国际化
+-----------------------------------------------------------------------------------------
+public class AcceptHeaderLocaleResolver implements LocaleResolver {
+
+	private final List<Locale> supportedLocales = new ArrayList<>(4);
+    
+    @Override
+	public Locale resolveLocale(HttpServletRequest request) {
+		Locale defaultLocale = getDefaultLocale();
+		if (defaultLocale != null && request.getHeader("Accept-Language") == null) {
+			return defaultLocale;
+		}
+		Locale requestLocale = request.getLocale();
+		List<Locale> supportedLocales = getSupportedLocales();
+		if (supportedLocales.isEmpty() || supportedLocales.contains(requestLocale)) {
+			return requestLocale;
+		}
+		Locale supportedLocale = findSupportedLocale(request, supportedLocales);
+		if (supportedLocale != null) {
+			return supportedLocale;
+		}
+		return (defaultLocale != null ? defaultLocale : requestLocale);
+	}
 ```
 
 4）、点击链接切换国际化
+
+在页面按钮处添加超链接并带有区域信息
+
+```html
+<a class="btn btn-sm" th:href="@{/index.html(locale='zh_CN')}">中文</a>
+<a class="btn btn-sm" th:href="@{/index.html(locale='en_US')}">English</a>
+```
+
+
 
 ```java
 /**
@@ -2170,8 +2182,6 @@ public class MyLocaleResolver implements LocaleResolver {
     @Override
     public Locale resolveLocale(HttpServletRequest request) {
         String l = request.getParameter("l");
-      
-      // 如果参数上没带区域信息，就用操作系统自带的，否则就用参数上带的
         Locale locale = Locale.getDefault();
         if(!StringUtils.isEmpty(l)){
             String[] split = l.split("_");
@@ -2186,7 +2196,7 @@ public class MyLocaleResolver implements LocaleResolver {
     }
 }
 
-
+//在配置类中添加
  @Bean
     public LocaleResolver localeResolver(){
         return new MyLocaleResolver();
@@ -2195,17 +2205,6 @@ public class MyLocaleResolver implements LocaleResolver {
 
 
 ```
-
-
-
-前端login.html片段代码：
-
-```html
-<a class="btn btn-sm" th:href="@{/index.html(l='zh_CN')}">中文</a>
-<a class="btn btn-sm" th:href="@{/index.html(l='en_US')}">English</a>
-```
-
-
 
 ### 3）、登陆
 
@@ -2219,6 +2218,24 @@ spring.thymeleaf.cache=false
 ```
 
 2）、页面修改完成以后ctrl+f9：重新编译；
+
+用户名密码校验
+
+```java
+@Controller
+public class LoginController {
+    @PostMapping("/user/login")
+    public String login(@RequestParam String username, @RequestParam String password, Map<String,Object> map) {
+        if (username.equals("mhs") && password.equals("123") ) {
+            //为防止页面刷新表单重复提交，使用重定向功能
+            return "redirect:/main.html";
+        }else {
+            map.put("msg", "用户名密码错误");
+            return "login";
+        }
+    }
+}
+```
 
 
 
@@ -2387,7 +2404,20 @@ insert的公共片段在div标签中
 
 
 
-引入片段的时候传入参数： 
+**侧面栏点击时自动高亮的问题**
+
+引入片段的时候传入参数： 在sidebar页面进行uri判断
+
+```html
+ <a class="nav-link active"
+                   th:class="${activeUri=='main.html'?'nav-link active':'nav-link'}"></a>
+```
+
+在引入页面传入参数
+
+```html
+<div th:replace="~{common/side::sidebar(activeUri='main.html')}"/>
+```
 
 ```html
 
@@ -2407,65 +2437,290 @@ insert的公共片段在div标签中
             </li>
 
 <!--引入侧边栏;传入参数-->
-<div th:replace="commons/bar::#sidebar(activeUri='emps')"></div>
+<div th:replace="~{common/side::sidebar(activeUri='main.html')}"/>
+```
+
+**员工列表显示**
+
+使用th:each遍历并进行性别判断和日期格式转换，并且添加编辑员工的按钮
+
+```html
+<h2><button type="button" class="btn btn-sm btn-success">员工添加</button> </h2>
+```
+
+```html
+<tr th:each="emp:${emps}">
+    <td>[[${emp.id}]]</td>
+    <td>[[${emp.lastName}]]</td>
+    <td>[[${emp.email}]]</td>
+    <td>[[${emp.gender==0?"男":"女"}]]</td>
+    <td>[[${emp.department.departmentName}]]</td>
+    <td th:text="${#dates.format(emp.birth,'yyyy-MM-dd HH:mm')}"></td>
+    <td>
+        <button type="button" class="btn btn-sm btn-primary">编辑</button>
+        <button type="button" class="btn btn-sm btn-danger">删除</button>
+    </td>
+</tr>
 ```
 
 ### 6）、CRUD-员工添加
 
-添加页面
+**添加页面**
 
 ```html
-<form>
-    <div class="form-group">
-        <label>LastName</label>
-        <input type="text" class="form-control" placeholder="zhangsan">
-    </div>
-    <div class="form-group">
-        <label>Email</label>
-        <input type="email" class="form-control" placeholder="zhangsan@atguigu.com">
-    </div>
-    <div class="form-group">
-        <label>Gender</label><br/>
-        <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="gender"  value="1">
-            <label class="form-check-label">男</label>
-        </div>
-        <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="gender"  value="0">
-            <label class="form-check-label">女</label>
-        </div>
-    </div>
-    <div class="form-group">
-        <label>department</label>
-        <select class="form-control">
-            <option>1</option>
-            <option>2</option>
-            <option>3</option>
-            <option>4</option>
-            <option>5</option>
-        </select>
-    </div>
-    <div class="form-group">
-        <label>Birth</label>
-        <input type="text" class="form-control" placeholder="zhangsan">
-    </div>
-    <button type="submit" class="btn btn-primary">添加</button>
+ <form th:action="@{/emp}" th:method="post">
+     <div class="form-group">
+         <label>LastName</label>
+         <input type="text" class="form-control" placeholder="zhangsan" name="lastName">
+     </div>
+     <div class="form-group">
+         <label>Email</label>
+         <input type="email" class="form-control" placeholder="zhangsan@atguigu.com" name="email">
+     </div>
+     <div class="form-group">
+         <label name="gender">Gender</label><br/>
+         <div class="form-check form-check-inline">
+             <input class="form-check-input" type="radio" name="gender"  value="1">
+             <label class="form-check-label">男</label>
+         </div>
+         <div class="form-check form-check-inline">
+             <input class="form-check-input" type="radio" name="gender"  value="0">
+             <label class="form-check-label">女</label>
+         </div>
+     </div>
+     <div class="form-group">
+         <label>department</label>
+         <select class="form-control" name="department.id">
+             <option th:each="department:${departments}" th:text="${department.id}" ></option>
+         </select>
+     </div>
+     <div class="form-group">
+         <label>Birth</label>
+         <input type="text" class="form-control" placeholder="2000/01/30" name="birth">
+     </div>
+     <button type="submit" class="btn btn-primary">添加</button>
 </form>
 ```
 
-提交的数据格式不对：生日：日期；
+**后台代码**
 
-2017-12-12；2017/12/12；2017.12.12；
+```java
 
-日期的格式化；SpringMVC将页面提交的值需要转换为指定的类型;
+    @GetMapping("/emp")
+    public String toAddPage(Model model) {
+        Collection<Department> departments = departmentDao.getDepartments();
+        model.addAttribute("departments", departments);
+        return "emp/add";
+    }
 
-2017-12-12---Date； 类型转换，格式化;
+    @PostMapping("/emp")
+    public String addEmp(Employee employee) {
+        employeeDao.save(employee);
+        return "redirect:/emps";
+    }
+```
 
-默认日期是按照/的方式；
+由于直接返回字符串默认转发给模板引擎处理，因此在要使用转发/重定向。
+
+
+
+**提交表单格式的问题**
+
+1. 要想让表单各项数据能直接封装进employee对象，必须保证各表单项的name属性值和Javabean属性名一致。
+2. 提交日期的默认格式为yyyy/MM/dd，否则会报错。
+
+可通过修改spring配置文件修改
+
+```properties
+#指定表单日期提交格式
+spring.mvc.date-format=yyyy-MM-dd
+```
+
+日期格式设置原理
+
+```java
+//在WebMvcAutoConfiguration类中有以下方法
+@Bean
+@Override
+public FormattingConversionService mvcConversionService() {
+    WebConversionService conversionService = new 		WebConversionService(this.mvcProperties.getDateFormat());
+    addFormatters(conversionService);
+    return conversionService;
+}
+```
+
+
+
+**关于contoller返回值前缀可用于转发/重定向原理**
+
+```java
+public class ThymeleafViewResolver extends AbstractCachingViewResolver implements Ordered {
+    protected View createView(String viewName, Locale locale) throws Exception {
+        if (!this.alwaysProcessRedirectAndForward && !this.canHandle(viewName, locale)) {
+            vrlogger.trace("[THYMELEAF] View \"{}\" cannot be handled by ThymeleafViewResolver. Passing on to the next resolver in the chain.", viewName);
+            return null;
+        } else {
+            String forwardUrl;
+            if (viewName.startsWith("redirect:")) {
+                vrlogger.trace("[THYMELEAF] View \"{}\" is a redirect, and will not be handled directly by ThymeleafViewResolver.", viewName);
+                forwardUrl = viewName.substring("redirect:".length(), viewName.length());
+                RedirectView view = new RedirectView(forwardUrl, this.isRedirectContextRelative(), this.isRedirectHttp10Compatible());
+                return (View)this.getApplicationContext().getAutowireCapableBeanFactory().initializeBean(view, viewName);
+            } else if (viewName.startsWith("forward:")) {
+                vrlogger.trace("[THYMELEAF] View \"{}\" is a forward, and will not be handled directly by ThymeleafViewResolver.", viewName);
+                forwardUrl = viewName.substring("forward:".length(), viewName.length());
+                return new InternalResourceView(forwardUrl);
+            } else if (this.alwaysProcessRedirectAndForward && !this.canHandle(viewName, locale)) {
+                vrlogger.trace("[THYMELEAF] View \"{}\" cannot be handled by ThymeleafViewResolver. Passing on to the next resolver in the chain.", viewName);
+                return null;
+            } else {
+                vrlogger.trace("[THYMELEAF] View {} will be handled by ThymeleafViewResolver and a {} instance will be created for it", viewName, this.getViewClass().getSimpleName());
+                return this.loadView(viewName, locale);
+            }
+        }
+    }
+```
+
+以上着重有以下几行
+
+```java
+ if (viewName.startsWith("redirect:")) {
+     ...
+     //如果以"redirect:"，则url截取之后的部分
+     forwardUrl = viewName.substring("redirect:".length(), viewName.length());
+     //创建RedirectView并返回
+     RedirectView view = new RedirectView(forwardUrl, this.isRedirectContextRelative(), this.isRedirectHttp10Compatible());
+     ...
+ } else if (viewName.startsWith("forward:")) {
+     //如果以"redirect:"，则url依然截取之后的部分
+     forwardUrl = viewName.substring("forward:".length(), viewName.length());
+     //返回InternalResourceView
+     return new InternalResourceView(forwardUrl);
+ } else {
+     //否则直接通过viewName加载视图
+     return this.loadView(viewName, locale);
+ }
+```
+
+之后可以通过RedirectView和InternalResourceView看到Servlet原生API
+
+```java
+public class RedirectView extends AbstractUrlBasedView implements SmartView {
+    /**
+	 * Convert model to request parameters and redirect to the given URL.
+	 * @see #appendQueryProperties
+	 * @see #sendRedirect
+	 */
+	@Override
+	protected void renderMergedOutputModel(Map<String, Object> model, HttpServletRequest request,
+			HttpServletResponse response) throws IOException {
+
+		String targetUrl = createTargetUrl(model, request);
+		targetUrl = updateTargetUrl(targetUrl, model, request, response);
+
+		// Save flash attributes
+		RequestContextUtils.saveOutputFlashMap(targetUrl, request, response);
+
+		// Redirect
+		sendRedirect(request, response, targetUrl, this.http10Compatible);
+	}
+    
+    protected void sendRedirect(HttpServletRequest request, HttpServletResponse response,
+			String targetUrl, boolean http10Compatible) throws IOException {
+
+		String encodedURL = (isRemoteHost(targetUrl) ? targetUrl : response.encodeRedirectURL(targetUrl));
+		if (http10Compatible) {
+			HttpStatus attributeStatusCode = (HttpStatus) request.getAttribute(View.RESPONSE_STATUS_ATTRIBUTE);
+			if (this.statusCode != null) {
+				response.setStatus(this.statusCode.value());
+				response.setHeader("Location", encodedURL);
+			}
+			else if (attributeStatusCode != null) {
+				response.setStatus(attributeStatusCode.value());
+				response.setHeader("Location", encodedURL);
+			}
+			else {
+				// Send status code 302 by default.
+				response.sendRedirect(encodedURL);
+			}
+		}
+		else {
+			HttpStatus statusCode = getHttp11StatusCode(request, response, targetUrl);
+			response.setStatus(statusCode.value());
+			response.setHeader("Location", encodedURL);
+		}
+	}
+```
+
+```java
+public class InternalResourceView extends AbstractUrlBasedView {
+    /**
+	 * Render the internal resource given the specified model.
+	 * This includes setting the model as request attributes.
+	 */
+	@Override
+	protected void renderMergedOutputModel(
+			Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+		// Expose the model object as request attributes.
+		exposeModelAsRequestAttributes(model, request);
+
+		// Expose helpers as request attributes, if any.
+		exposeHelpers(request);
+
+		// Determine the path for the request dispatcher.
+		String dispatcherPath = prepareForRendering(request, response);
+
+		// Obtain a RequestDispatcher for the target resource (typically a JSP).
+		RequestDispatcher rd = getRequestDispatcher(request, dispatcherPath);
+		if (rd == null) {
+			throw new ServletException("Could not get RequestDispatcher for [" + getUrl() +
+					"]: Check that the corresponding file exists within your web application archive!");
+		}
+
+		// If already included or response already committed, perform include, else forward.
+		if (useInclude(request, response)) {
+			response.setContentType(getContentType());
+			if (logger.isDebugEnabled()) {
+				logger.debug("Including [" + getUrl() + "]");
+			}
+			rd.include(request, response);
+		}
+
+		else {
+			// Note: The forwarded resource is supposed to determine the content type itself.
+			if (logger.isDebugEnabled()) {
+				logger.debug("Forwarding to [" + getUrl() + "]");
+			}
+			rd.forward(request, response);
+		}
+	}
+}
+```
 
 ### 7）、CRUD-员工修改
 
-修改添加二合一表单
+**put/delete请求的处理**
+
+由于html默认不支持put请求，因此需要
+
+1、SpringMVC中配置HiddenHttpMethodFilter;（SpringBoot自动配置好的）
+2、页面创建一个post表单
+3、创建一个input项，name="_method";值就是我们指定的请求方式
+
+```html
+ <input type="hidden" name="_method" value="put"/>
+```
+
+**修改添加二合一表单**
+
+修改时在域对象中有emp对象，因此可通过emp是否为空在判断是在修改添加页面
+
+修改页面与添加页面有三处不同：
+
+1. 添加put请求的表单并且添加id的表单项
+2. 将修改之前的数据进行回显（注意下拉框和日期）
+3. 修改/添加按钮
 
 ```html
 <!--需要区分是员工修改还是添加；-->
@@ -2510,6 +2765,26 @@ insert的公共片段在div标签中
     </div>
     <button type="submit" class="btn btn-primary" th:text="${emp!=null}?'修改':'添加'">添加</button>
 </form>
+```
+
+**后台**
+
+```java
+   @GetMapping("/emp/{id}")
+    public String toEditPage(@PathVariable("id")Integer id,Model model) {
+        Employee employee = employeeDao.get(id);
+        Collection<Department> departments = departmentDao.getDepartments();
+        model.addAttribute("departments", departments);
+        model.addAttribute("emp", employee);
+        return "/emp/add";
+    }
+
+    @PutMapping("/emp")
+    public String editEmp(Employee employee) {
+        System.out.println(employee);
+        employeeDao.save(employee);
+        return  "redirect:/emps";
+    }
 ```
 
 ### 8）、CRUD-员工删除
@@ -2560,7 +2835,7 @@ insert的公共片段在div标签中
 
 ​		![](images/搜狗截图20180226180504.png)
 
-原理：
+**原理：**
 
 ​	可以参照ErrorMvcAutoConfiguration；错误处理的自动配置；
 
@@ -2614,21 +2889,42 @@ public class BasicErrorController extends AbstractErrorController {
 	}
 ```
 
-
-
 ​	3、ErrorPageCustomizer：
 
 ```java
-	@Value("${error.path:/error}")
-	private String path = "/error";  系统出现错误以后来到error请求进行处理；（web.xml注册的错误页面规则）
+@Override
+		public void registerErrorPages(ErrorPageRegistry errorPageRegistry) {
+			ErrorPage errorPage = new ErrorPage(
+	this.dispatcherServletPath.getRelativePath(this.properties.getError().getPath()));
+			errorPageRegistry.addErrorPages(errorPage);
+		}
 ```
 
+```java
+public class ErrorProperties {
+    public String getPath() {
+		return this.path;
+	}
+    
+	@Value("${error.path:/error}")
+	private String path = "/error";  
+```
 
+系统出现错误以后来到error请求进行处理；（类似于web.xml注册的错误页面规则）
 
 ​	4、DefaultErrorViewResolver：
 
 ```java
-@Override
+	private static final Map<Series, String> SERIES_VIEWS;
+
+	static {
+		Map<Series, String> views = new EnumMap<>(Series.class);
+		views.put(Series.CLIENT_ERROR, "4xx");
+		views.put(Series.SERVER_ERROR, "5xx");
+		SERIES_VIEWS = Collections.unmodifiableMap(views);
+	}
+
+	@Override
 	public ModelAndView resolveErrorView(HttpServletRequest request, HttpStatus status,
 			Map<String, Object> model) {
 		ModelAndView modelAndView = resolve(String.valueOf(status), model);
@@ -2658,9 +2954,25 @@ public class BasicErrorController extends AbstractErrorController {
 
 ​	步骤：
 
+​		在服务器启动时就会进入ErrorPageCustomizer注册错误页面处理路径为/error
+
 ​		一但系统出现4xx或者5xx之类的错误；ErrorPageCustomizer就会生效（定制错误的响应规则）；就会来到/error请求；就会被**BasicErrorController**处理；
 
-​		1）响应页面；去哪个页面是由**DefaultErrorViewResolver**解析得到的；
+```java
+@RequestMapping(produces = MediaType.TEXT_HTML_VALUE)
+	public ModelAndView errorHtml(HttpServletRequest request, HttpServletResponse response) {
+        //此方法执行之前会进入DefaultErrorAttributes获取属性
+		HttpStatus status = getStatus(request);
+		Map<String, Object> model = Collections
+				.unmodifiableMap(getErrorAttributes(request, isIncludeStackTrace(request, MediaType.TEXT_HTML)));
+		response.setStatus(status.value());
+        //进入组件DefaultErrorViewResolver处理请求得到modelandview
+		ModelAndView modelAndView = resolveErrorView(request, response, status, model);
+		return (modelAndView != null) ? modelAndView : new ModelAndView("error", model);
+	}
+```
+
+响应页面；去哪个页面是由**DefaultErrorViewResolver**解析得到的；
 
 ```java
 protected ModelAndView resolveErrorView(HttpServletRequest request,
@@ -2698,6 +3010,12 @@ protected ModelAndView resolveErrorView(HttpServletRequest request,
 
 ​				errors：JSR303数据校验的错误都在这里
 
+要想在页面获取**异常对象**，需要在spring配置文件中加入，默认为false
+
+```properties
+server.error.include-exception=true
+```
+
 ​			2）、没有模板引擎（模板引擎找不到这个错误页面），静态资源文件夹下找；
 
 ​			3）、以上都没有错误页面，就是默认来到SpringBoot默认的错误提示页面；
@@ -2711,7 +3029,6 @@ protected ModelAndView resolveErrorView(HttpServletRequest request,
 ```java
 @ControllerAdvice
 public class MyExceptionHandler {
-
     @ResponseBody
     @ExceptionHandler(UserNotExistException.class)
     public Map<String,Object> handleException(Exception e){
@@ -2721,12 +3038,11 @@ public class MyExceptionHandler {
         return map;
     }
 }
-//没有自适应效果...
 ```
 
+使用这种方式可以返回定制的json数据，但不能产生自适应效果，也就是浏览器和其他客户端访问时都会产生json
 
-
-​		2）、转发到/error进行自适应响应效果处理
+​		2）、转发到/error进行自适应响应效果处理（但无法携带定制数据）
 
 ```java
  @ExceptionHandler(UserNotExistException.class)
@@ -2740,10 +3056,31 @@ public class MyExceptionHandler {
         request.setAttribute("javax.servlet.error.status_code",500);
         map.put("code","user.notexist");
         map.put("message",e.getMessage());
+        //将信息放入request域中，以便之后取出
+        request.setAttribute("ext",map);
         //转发到/error
         return "forward:/error";
     }
 ```
+
+必须要在request域内设置javax.servlet.error.status_code属性，否则状态码默认设置为200，因此无法找到正确的错误页面
+
+```java
+protected HttpStatus getStatus(HttpServletRequest request) {
+		Integer statusCode = (Integer) request.getAttribute("javax.servlet.error.status_code");
+		if (statusCode == null) {
+			return HttpStatus.INTERNAL_SERVER_ERROR;
+		}
+		try {
+			return HttpStatus.valueOf(statusCode);
+		}
+		catch (Exception ex) {
+			return HttpStatus.INTERNAL_SERVER_ERROR;
+		}
+	}
+```
+
+
 
 #### 	3）、将我们的定制数据携带出去；
 
@@ -2765,6 +3102,9 @@ public class MyErrorAttributes extends DefaultErrorAttributes {
     @Override
     public Map<String, Object> getErrorAttributes(RequestAttributes requestAttributes, boolean includeStackTrace) {
         Map<String, Object> map = super.getErrorAttributes(requestAttributes, includeStackTrace);
+        //将之前request域中的信息取出
+        Map<String,Object> ext = (Map<String, Object>) webRequest.getAttribute("ext", 0);
+        map.put("ext", ext);
         map.put("company","atguigu");
         return map;
     }
@@ -2789,7 +3129,7 @@ SpringBoot默认使用Tomcat作为嵌入式的Servlet容器；
 
 ### 1）、如何定制和修改Servlet容器的相关配置；
 
-1、修改和server有关的配置（ServerProperties【也是EmbeddedServletContainerCustomizer】）；
+1、修改和server有关的配置（ServerProperties）；
 
 ```properties
 server.port=8081
@@ -2803,20 +3143,51 @@ server.xxx
 server.tomcat.xxx
 ```
 
-2、编写一个**EmbeddedServletContainerCustomizer**：嵌入式的Servlet容器的定制器；来修改Servlet容器的配置
+**ServerProperties的原理**
+
+ServerProperties类中有许多属性都可以使用配置文件配置，**@ConfigurationProperties**注解使得将配置文件转化为Javabean对象，配置文件中前缀为server
+
+```java
+@ConfigurationProperties(prefix = "server", ignoreUnknownFields = true)
+public class ServerProperties {
+    
+	private Integer port;
+    
+    private final Servlet servlet = new Servlet();
+
+	private final Tomcat tomcat = new Tomcat();
+    ...
+```
+
+在服务器启动时容器中导入了许多自动配置类，其中ServletWebServerFactoryAutoConfiguration类上**@EnableConfigurationProperties(ServerProperties.class)**保证了ServerProperties可以的**@ConfigurationProperties**可以起作用
+
+```java
+@Configuration(proxyBeanMethods = false)
+@AutoConfigureOrder(Ordered.HIGHEST_PRECEDENCE)
+@ConditionalOnClass(ServletRequest.class)
+@ConditionalOnWebApplication(type = Type.SERVLET)
+@EnableConfigurationProperties(ServerProperties.class)
+@Import({ ServletWebServerFactoryAutoConfiguration.BeanPostProcessorsRegistrar.class,
+		ServletWebServerFactoryConfiguration.EmbeddedTomcat.class,
+		ServletWebServerFactoryConfiguration.EmbeddedJetty.class,
+		ServletWebServerFactoryConfiguration.EmbeddedUndertow.class })
+public class ServletWebServerFactoryAutoConfiguration {
+```
+
+2、编写一个**WebServerFactoryCustomizer**：嵌入式的Servlet容器的定制器；来修改Servlet容器的配置
 
 ```java
 @Bean  //一定要将这个定制器加入到容器中
-public EmbeddedServletContainerCustomizer embeddedServletContainerCustomizer(){
-    return new EmbeddedServletContainerCustomizer() {
+    public WebServerFactoryCustomizer<ConfigurableServletWebServerFactory> embeddedServletContainerCustomizer(){
+        return new WebServerFactoryCustomizer<ConfigurableServletWebServerFactory>() {
+            @Override
+            public void customize(ConfigurableServletWebServerFactory factory) {
+                factory.setPort(9000);
+                factory.setContextPath("/cccc");
+            }
 
-        //定制嵌入式的Servlet容器相关的规则
-        @Override
-        public void customize(ConfigurableEmbeddedServletContainer container) {
-            container.setPort(8083);
-        }
-    };
-}
+        };
+    }
 ```
 
 ### 2）、注册Servlet三大组件【Servlet、Filter、Listener】
@@ -2888,6 +3259,21 @@ public ServletRegistrationBean dispatcherServletRegistration(
 
 2）、SpringBoot能不能支持其他的Servlet容器；
 
+要想使用其他的容器，要先排除tomcat依赖
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+    <exclusions>
+        <exclusion>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <groupId>org.springframework.boot</groupId>
+        </exclusion>
+    </exclusions>
+</dependency>
+```
+
 ### 3）、替换为其他嵌入式Servlet容器
 
 ![](images/搜狗截图20180302114401.png)
@@ -2950,44 +3336,63 @@ Undertow
 
 ### 4）、嵌入式Servlet容器自动配置原理；
 
-
-
-EmbeddedServletContainerAutoConfiguration：嵌入式的Servlet容器自动配置？
+**1. ServletWebServerFactoryAutoConfiguration：嵌入式的Servlet容器自动配置类**
 
 ```java
+@Configuration(proxyBeanMethods = false)
 @AutoConfigureOrder(Ordered.HIGHEST_PRECEDENCE)
-@Configuration
-@ConditionalOnWebApplication
-@Import(BeanPostProcessorsRegistrar.class)
-//导入BeanPostProcessorsRegistrar：Spring注解版；给容器中导入一些组件
-//导入了EmbeddedServletContainerCustomizerBeanPostProcessor：
-//后置处理器：bean初始化前后（创建完对象，还没赋值赋值）执行初始化工作
-public class EmbeddedServletContainerAutoConfiguration {
-    
-    @Configuration
-	@ConditionalOnClass({ Servlet.class, Tomcat.class })//判断当前是否引入了Tomcat依赖；
-	@ConditionalOnMissingBean(value = EmbeddedServletContainerFactory.class, search = SearchStrategy.CURRENT)//判断当前容器没有用户自己定义EmbeddedServletContainerFactory：嵌入式的Servlet容器工厂；作用：创建嵌入式的Servlet容器
-	public static class EmbeddedTomcat {
+@ConditionalOnClass(ServletRequest.class)
+@ConditionalOnWebApplication(type = Type.SERVLET)
+@EnableConfigurationProperties(ServerProperties.class)
+@Import({ ServletWebServerFactoryAutoConfiguration.BeanPostProcessorsRegistrar.class,
+		ServletWebServerFactoryConfiguration.EmbeddedTomcat.class,
+		ServletWebServerFactoryConfiguration.EmbeddedJetty.class,
+		ServletWebServerFactoryConfiguration.EmbeddedUndertow.class })
+public class ServletWebServerFactoryAutoConfiguration {
+```
+
+该类导入了BeanPostProcessorsRegistrar和ServletWebServerFactoryConfiguration类中的内部类**EmbeddedTomcat**、**EmbeddedJetty**、**EmbeddedUndertow**
+
+```java
+@Configuration(proxyBeanMethods = false)
+class ServletWebServerFactoryConfiguration {
+
+	@Configuration(proxyBeanMethods = false)
+	@ConditionalOnClass({ Servlet.class, Tomcat.class, UpgradeProtocol.class })
+	@ConditionalOnMissingBean(value = ServletWebServerFactory.class, search = SearchStrategy.CURRENT)
+	static class EmbeddedTomcat {
 
 		@Bean
-		public TomcatEmbeddedServletContainerFactory tomcatEmbeddedServletContainerFactory() {
-			return new TomcatEmbeddedServletContainerFactory();
+		TomcatServletWebServerFactory tomcatServletWebServerFactory(
+				ObjectProvider<TomcatConnectorCustomizer> connectorCustomizers,
+				ObjectProvider<TomcatContextCustomizer> contextCustomizers,
+				ObjectProvider<TomcatProtocolHandlerCustomizer<?>> protocolHandlerCustomizers) {
+			TomcatServletWebServerFactory factory = new TomcatServletWebServerFactory();
+			factory.getTomcatConnectorCustomizers()
+					.addAll(connectorCustomizers.orderedStream().collect(Collectors.toList()));
+			factory.getTomcatContextCustomizers()
+					.addAll(contextCustomizers.orderedStream().collect(Collectors.toList()));
+			factory.getTomcatProtocolHandlerCustomizers()
+					.addAll(protocolHandlerCustomizers.orderedStream().collect(Collectors.toList()));
+			return factory;
 		}
 
 	}
-    
-    /**
+
+	/**
 	 * Nested configuration if Jetty is being used.
 	 */
-	@Configuration
-	@ConditionalOnClass({ Servlet.class, Server.class, Loader.class,
-			WebAppContext.class })
-	@ConditionalOnMissingBean(value = EmbeddedServletContainerFactory.class, search = SearchStrategy.CURRENT)
-	public static class EmbeddedJetty {
+	@Configuration(proxyBeanMethods = false)
+	@ConditionalOnClass({ Servlet.class, Server.class, Loader.class, WebAppContext.class })
+	@ConditionalOnMissingBean(value = ServletWebServerFactory.class, search = SearchStrategy.CURRENT)
+	static class EmbeddedJetty {
 
 		@Bean
-		public JettyEmbeddedServletContainerFactory jettyEmbeddedServletContainerFactory() {
-			return new JettyEmbeddedServletContainerFactory();
+		JettyServletWebServerFactory JettyServletWebServerFactory(
+				ObjectProvider<JettyServerCustomizer> serverCustomizers) {
+			JettyServletWebServerFactory factory = new JettyServletWebServerFactory();
+			factory.getServerCustomizers().addAll(serverCustomizers.orderedStream().collect(Collectors.toList()));
+			return factory;
 		}
 
 	}
@@ -2995,135 +3400,219 @@ public class EmbeddedServletContainerAutoConfiguration {
 	/**
 	 * Nested configuration if Undertow is being used.
 	 */
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@ConditionalOnClass({ Servlet.class, Undertow.class, SslClientAuthMode.class })
-	@ConditionalOnMissingBean(value = EmbeddedServletContainerFactory.class, search = SearchStrategy.CURRENT)
-	public static class EmbeddedUndertow {
+	@ConditionalOnMissingBean(value = ServletWebServerFactory.class, search = SearchStrategy.CURRENT)
+	static class EmbeddedUndertow {
 
 		@Bean
-		public UndertowEmbeddedServletContainerFactory undertowEmbeddedServletContainerFactory() {
-			return new UndertowEmbeddedServletContainerFactory();
+		UndertowServletWebServerFactory undertowServletWebServerFactory(
+				ObjectProvider<UndertowDeploymentInfoCustomizer> deploymentInfoCustomizers,
+				ObjectProvider<UndertowBuilderCustomizer> builderCustomizers) {
+			UndertowServletWebServerFactory factory = new UndertowServletWebServerFactory();
+			factory.getDeploymentInfoCustomizers()
+					.addAll(deploymentInfoCustomizers.orderedStream().collect(Collectors.toList()));
+			factory.getBuilderCustomizers().addAll(builderCustomizers.orderedStream().collect(Collectors.toList()));
+			return factory;
 		}
 
 	}
-```
-
-1）、EmbeddedServletContainerFactory（嵌入式Servlet容器工厂）
-
-```java
-public interface EmbeddedServletContainerFactory {
-
-   //获取嵌入式的Servlet容器
-   EmbeddedServletContainer getEmbeddedServletContainer(
-         ServletContextInitializer... initializers);
 
 }
 ```
 
-![](images/搜狗截图20180302144835.png)
+ServletWebServerFactoryConfiguration会根据容器中@ConditionalOnClass判断使用哪个嵌入式容器，然后将其工厂容器化
 
-2）、EmbeddedServletContainer：（嵌入式的Servlet容器）
+![继承关系](images/Snipaste_2020-03-28_00-41-49.png)
 
-![](images/搜狗截图20180302144910.png)
-
-
-
-3）、以**TomcatEmbeddedServletContainerFactory**为例
+**2. 嵌入式Tomcat的创建与启动**
 
 ```java
-@Override
-public EmbeddedServletContainer getEmbeddedServletContainer(
-      ServletContextInitializer... initializers) {
-    //创建一个Tomcat
-   Tomcat tomcat = new Tomcat();
+	@Configuration(proxyBeanMethods = false)
+	@ConditionalOnClass({ Servlet.class, Tomcat.class, UpgradeProtocol.class })
+	@ConditionalOnMissingBean(value = ServletWebServerFactory.class, search = SearchStrategy.CURRENT)
+	static class EmbeddedTomcat {
+		@Bean
+		TomcatServletWebServerFactory tomcatServletWebServerFactory(
+				ObjectProvider<TomcatConnectorCustomizer> connectorCustomizers,
+				ObjectProvider<TomcatContextCustomizer> contextCustomizers,
+				ObjectProvider<TomcatProtocolHandlerCustomizer<?>> protocolHandlerCustomizers) {
+			TomcatServletWebServerFactory factory = new TomcatServletWebServerFactory();
+			factory.getTomcatConnectorCustomizers()
+					.addAll(connectorCustomizers.orderedStream().collect(Collectors.toList()));
+			factory.getTomcatContextCustomizers()
+					.addAll(contextCustomizers.orderedStream().collect(Collectors.toList()));
+			factory.getTomcatProtocolHandlerCustomizers()
+				.addAll(protocolHandlerCustomizers.orderedStream().collect(Collectors.toList()));
+			return factory;
+		}
+
+```
+
+EmbeddedTomcat将TomcatServletWebServerFactory做了一些设置，并导入容器
+
+```java
+public class TomcatServletWebServerFactory extends AbstractServletWebServerFactory
+		implements ConfigurableTomcatWebServerFactory, ResourceLoaderAware {
+    @Override
+	public WebServer getWebServer(ServletContextInitializer... initializers) {
+		if (this.disableMBeanRegistry) {
+			Registry.disableRegistry();
+		}
+        //创建Tomcat
+		Tomcat tomcat = new Tomcat();
+        
+        //配置Tomcat的基本环节
+		File baseDir = (this.baseDirectory != null) ? this.baseDirectory : createTempDir("tomcat");
+		tomcat.setBaseDir(baseDir.getAbsolutePath());
+		Connector connector = new Connector(this.protocol);
+		connector.setThrowOnFailure(true);
+		tomcat.getService().addConnector(connector);
+		customizeConnector(connector);
+		tomcat.setConnector(connector);
+		tomcat.getHost().setAutoDeploy(false);
+		configureEngine(tomcat.getEngine());
+		for (Connector additionalConnector : this.additionalTomcatConnectors) {
+			tomcat.getService().addConnector(additionalConnector);
+		}
+		prepareContext(tomcat.getHost(), initializers);
+        
+        //将配置好的Tomcat传入进去，返回一个TomcatWebServer；并且启动Tomcat服务器
+		return getTomcatWebServer(tomcat);
+	}
     
-    //配置Tomcat的基本环节
-   File baseDir = (this.baseDirectory != null ? this.baseDirectory
-         : createTempDir("tomcat"));
-   tomcat.setBaseDir(baseDir.getAbsolutePath());
-   Connector connector = new Connector(this.protocol);
-   tomcat.getService().addConnector(connector);
-   customizeConnector(connector);
-   tomcat.setConnector(connector);
-   tomcat.getHost().setAutoDeploy(false);
-   configureEngine(tomcat.getEngine());
-   for (Connector additionalConnector : this.additionalTomcatConnectors) {
-      tomcat.getService().addConnector(additionalConnector);
-   }
-   prepareContext(tomcat.getHost(), initializers);
-    
-    //将配置好的Tomcat传入进去，返回一个EmbeddedServletContainer；并且启动Tomcat服务器
-   return getTomcatEmbeddedServletContainer(tomcat);
-}
+    protected TomcatWebServer getTomcatWebServer(Tomcat tomcat) {
+        //端口号>0就自动开始
+		return new TomcatWebServer(tomcat, getPort() >= 0);
+	}
 ```
 
-4）、我们对嵌入式容器的配置修改是怎么生效？
-
-```
-ServerProperties、EmbeddedServletContainerCustomizer
-```
-
-
-
-**EmbeddedServletContainerCustomizer**：定制器帮我们修改了Servlet容器的配置？
-
-怎么修改的原理？
-
-5）、容器中导入了**EmbeddedServletContainerCustomizerBeanPostProcessor**
+可以看到创建Tomcat的最后是调用了getTomcatWebServe( ) 方法，而方法调用了TomcatWebServer的构造器，因此进入TomcatWebServer中
 
 ```java
-//初始化之前
-@Override
-public Object postProcessBeforeInitialization(Object bean, String beanName)
-      throws BeansException {
-    //如果当前初始化的是一个ConfigurableEmbeddedServletContainer类型的组件
-   if (bean instanceof ConfigurableEmbeddedServletContainer) {
-       //
-      postProcessBeforeInitialization((ConfigurableEmbeddedServletContainer) bean);
-   }
-   return bean;
-}
+public class TomcatWebServer implements WebServer {
+    public TomcatWebServer(Tomcat tomcat, boolean autoStart) {
+		Assert.notNull(tomcat, "Tomcat Server must not be null");
+		this.tomcat = tomcat;
+		this.autoStart = autoStart;
+		initialize();
+	}
+    
+    	private void initialize() throws WebServerException {
+		logger.info("Tomcat initialized with port(s): " + getPortsDescription(false));
+		synchronized (this.monitor) {
+			try {
+				addInstanceIdToEngineName();
 
-private void postProcessBeforeInitialization(
-			ConfigurableEmbeddedServletContainer bean) {
-    //获取所有的定制器，调用每一个定制器的customize方法来给Servlet容器进行属性赋值；
-    for (EmbeddedServletContainerCustomizer customizer : getCustomizers()) {
-        customizer.customize(bean);
+				Context context = findContext();
+				context.addLifecycleListener((event) -> {
+					if (context.equals(event.getSource()) && Lifecycle.START_EVENT.equals(event.getType())) {
+						removeServiceConnectors();
+					}
+				});
+
+				//启动Tomcat
+				this.tomcat.start();
+
+				rethrowDeferredStartupExceptions();
+
+				try {
+					ContextBindings.bindClassLoader(context, context.getNamingToken(), getClass().getClassLoader());
+				}
+				catch (NamingException ex) {
+				
+				}
+				startDaemonAwaitThread();
+			}
+			catch (Exception ex) {
+				stopSilently();
+				destroySilently();
+                //不能启动则抛出异常
+				throw new WebServerException("Unable to start embedded Tomcat", ex);
+			}
+		}
+	}
+```
+
+在TomcatWebServer类中启动嵌入式Tomcat，如果不能启动则抛出异常
+
+<img src="images/Snipaste_2020-03-28_11-21-42.png" style="zoom: 67%;" />
+
+
+
+**3. 我们对嵌入式容器的配置修改是怎么生效**
+
+ServletWebServerFactoryAutoConfiguration还导入了其内部类BeanPostProcessorsRegistrar类
+
+```java
+public static class BeanPostProcessorsRegistrar implements ImportBeanDefinitionRegistrar, BeanFactoryAware {
+    @Override
+		public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata,
+				BeanDefinitionRegistry registry) {
+			if (this.beanFactory == null) {
+				return;
+			}
+            //如果容器中没有则注册WebServerFactoryCustomizerBeanPostProcessor类
+			registerSyntheticBeanIfMissing(registry, "webServerFactoryCustomizerBeanPostProcessor",
+					WebServerFactoryCustomizerBeanPostProcessor.class);
+			registerSyntheticBeanIfMissing(registry, "errorPageRegistrarBeanPostProcessor",
+					ErrorPageRegistrarBeanPostProcessor.class);
+		}
+```
+
+BeanPostProcessorsRegistrar注册了WebServerFactoryCustomizerBeanPostProcessor类
+
+```java
+public class WebServerFactoryCustomizerBeanPostProcessor implements BeanPostProcessor, BeanFactoryAware {
+    @Override
+    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+        //如果当前初始化的为WebServerFactory类型的组件，则开启后处理
+        if (bean instanceof WebServerFactory) {
+            postProcessBeforeInitialization((WebServerFactory) bean);
+        }
+        return bean;
     }
-}
 
-private Collection<EmbeddedServletContainerCustomizer> getCustomizers() {
-    if (this.customizers == null) {
-        // Look up does not include the parent context
-        this.customizers = new ArrayList<EmbeddedServletContainerCustomizer>(
-            this.beanFactory
-            //从容器中获取所有这葛类型的组件：EmbeddedServletContainerCustomizer
-            //定制Servlet容器，给容器中可以添加一个EmbeddedServletContainerCustomizer类型的组件
-            .getBeansOfType(EmbeddedServletContainerCustomizer.class,
-                            false, false)
-            .values());
-        Collections.sort(this.customizers, AnnotationAwareOrderComparator.INSTANCE);
-        this.customizers = Collections.unmodifiableList(this.customizers);
+
+    //在WebServerFactory初始化之前调用WebServerFactoryCustomizer的所有customize()方法
+    private void postProcessBeforeInitialization(WebServerFactory webServerFactory) {
+        LambdaSafe.callbacks(WebServerFactoryCustomizer.class, getCustomizers(), webServerFactory)
+            .withLogger(WebServerFactoryCustomizerBeanPostProcessor.class)
+            .invoke((customizer) -> customizer.customize(webServerFactory));
     }
-    return this.customizers;
-}
+```
 
-ServerProperties也是定制器
+WebServerFactoryCustomizerBeanPostProcessor在WebServerFactory初始化前回调了WebServerFactoryCustomizer的方法，而该方法就是我们的定制方法,=，下面是我们自己的配置类中定制代码
+
+```java
+@Configuration
+public class MyMvcConfig implements WebMvcConfigurer {
+	 @Bean  
+    public WebServerFactoryCustomizer<ConfigurableServletWebServerFactory> webServerFactoryCustomizer(){
+        return new WebServerFactoryCustomizer<ConfigurableServletWebServerFactory>() {
+            @Override
+            public void customize(ConfigurableServletWebServerFactory factory) {
+                factory.setPort(9000);
+                factory.setContextPath("/cccc");
+            }
+
+        };
+    }
 ```
 
 步骤：
 
-1）、SpringBoot根据导入的依赖情况，给容器中添加相应的EmbeddedServletContainerFactory【TomcatEmbeddedServletContainerFactory】
+1）、SpringBoot根据导入的依赖情况，给容器中添加相应的ServletWebServerFactory
 
-2）、容器中某个组件要创建对象就会惊动后置处理器；EmbeddedServletContainerCustomizerBeanPostProcessor；
+2）、容器中某个组件要创建对象就会惊动后置处理器WebServerFactoryCustomizerBeanPostProcessor；
 
 只要是嵌入式的Servlet容器工厂，后置处理器就工作；
 
-3）、后置处理器，从容器中获取所有的**EmbeddedServletContainerCustomizer**，调用定制器的定制方法
+3）、后置处理器，从容器中获取所有的**WebServerFactoryCustomizer**，调用定制器的定制方法
 
 
 
-###5）、嵌入式Servlet容器启动原理；
+==**嵌入式Servlet容器启动原理**==
 
 什么时候创建嵌入式的Servlet容器工厂？什么时候获取嵌入式的Servlet容器并启动Tomcat；
 
@@ -3131,7 +3620,51 @@ ServerProperties也是定制器
 
 1）、SpringBoot应用启动运行run方法
 
-2）、refreshContext(context);SpringBoot刷新IOC容器【创建IOC容器对象，并初始化容器，创建容器中的每一个组件】；如果是web应用创建**AnnotationConfigEmbeddedWebApplicationContext**，否则：**AnnotationConfigApplicationContext**
+2）、refreshContext(context);SpringBoot刷新IOC容器【创建IOC容器对象，并初始化容器，创建容器中的每一个组件】；并根据web应用的类型创建对应的IOC容器对象（如AnnotationConfigServletWebServerApplicationContext）
+
+```java
+public class SpringApplication {
+    public ConfigurableApplicationContext run(String... args) {
+        ...
+            //创建IOC容器
+			context = createApplicationContext();
+			exceptionReporters = getSpringFactoriesInstances(SpringBootExceptionReporter.class,
+					new Class[] { ConfigurableApplicationContext.class }, context);
+			prepareContext(context, environment, listeners, applicationArguments, printedBanner);
+            //刷新IOC容器
+			refreshContext(context);
+			afterRefresh(context, applicationArguments);
+        ...
+	}
+    
+    	protected ConfigurableApplicationContext createApplicationContext() {
+		Class<?> contextClass = this.applicationContextClass;
+            //如果不是普通应用则创建web应用容器
+		if (contextClass == null) {
+			try {
+                //根据web应用类型创建对应IOC容器
+				switch (this.webApplicationType) {
+				case SERVLET:
+                        //AnnotationConfigServletWebServerApplicationContext
+					contextClass = Class.forName(DEFAULT_SERVLET_WEB_CONTEXT_CLASS);
+					break;
+				case REACTIVE:
+					contextClass = Class.forName(DEFAULT_REACTIVE_WEB_CONTEXT_CLASS);
+					break;
+				default:
+					contextClass = Class.forName(DEFAULT_CONTEXT_CLASS);
+				}
+			}
+			catch (ClassNotFoundException ex) {
+				throw new IllegalStateException(
+						"Unable create a default ApplicationContext, please specify an ApplicationContextClass", ex);
+			}
+		}
+		return (ConfigurableApplicationContext) BeanUtils.instantiateClass(contextClass);
+	}
+```
+
+
 
 3）、refresh(context);**刷新刚才创建好的ioc容器；**
 
@@ -3201,25 +3734,73 @@ public void refresh() throws BeansException, IllegalStateException {
 }
 ```
 
-4）、  onRefresh(); web的ioc容器重写了onRefresh方法
+4）、  onRefresh(); web的ioc容器重写了onRefresh方法,在此方法中调用getWebServerFactory()，根据环境创建工厂，因为此时为tomcat环境，因此创建了TomcatServletWebServerFactory。
 
-5）、webioc容器会创建嵌入式的Servlet容器；**createEmbeddedServletContainer**();
+5）、ServletWebServerFactory的创建触发了后置处理器，获取所有的定制器来先定制Servlet容器的相关配置；
 
-**6）、获取嵌入式的Servlet容器工厂：**
+6）、此时ServletWebServerFactory实际引用了TomcatServletWebServerFactory，因此调用了TomcatServletWebServerFactory的getWebServer( )方法，在该方法中tomcat被创建并启动。
 
-EmbeddedServletContainerFactory containerFactory = getEmbeddedServletContainerFactory();
+```java
+public class ServletWebServerApplicationContext extends GenericWebApplicationContext
+		implements ConfigurableWebServerApplicationContext {
+    @Override
+	protected void onRefresh() {
+		super.onRefresh();
+		try {
+			createWebServer();
+		}
+		catch (Throwable ex) {
+			throw new ApplicationContextException("Unable to start web server", ex);
+		}
+	}
+    
+    private void createWebServer() {
+		WebServer webServer = this.webServer;
+		ServletContext servletContext = getServletContext();
+		if (webServer == null && servletContext == null) {
+            //由于此时为tomcat环境，因此ServletWebServerFactory实际上就是TomcatServletWebServerFactory
+			ServletWebServerFactory factory = getWebServerFactory();
+            //调用TomcatServletWebServerFactory的getWebServer()方法
+			this.webServer = factory.getWebServer(getSelfInitializer());
+		}
+		else if (servletContext != null) {
+			try {
+				getSelfInitializer().onStartup(servletContext);
+			}
+			catch (ServletException ex) {
+				throw new ApplicationContextException("Cannot initialize servlet context", ex);
+			}
+		}
+		initPropertySources();
+	}
+```
 
-​	从ioc容器中获取EmbeddedServletContainerFactory 组件；**TomcatEmbeddedServletContainerFactory**创建对象，后置处理器一看是这个对象，就获取所有的定制器来先定制Servlet容器的相关配置；
-
-7）、**使用容器工厂获取嵌入式的Servlet容器**：this.embeddedServletContainer = containerFactory      .getEmbeddedServletContainer(getSelfInitializer());
-
-8）、嵌入式的Servlet容器创建对象并启动Servlet容器；
-
-**先启动嵌入式的Servlet容器，再将ioc容器中剩下没有创建出的对象获取出来；**
-
-**==IOC容器启动创建嵌入式的Servlet容器==**
-
-
+```java
+public class TomcatServletWebServerFactory extends AbstractServletWebServerFactory
+		implements ConfigurableTomcatWebServerFactory, ResourceLoaderAware {
+    @Override
+	public WebServer getWebServer(ServletContextInitializer... initializers) {
+		if (this.disableMBeanRegistry) {
+			Registry.disableRegistry();
+		}
+        //创建Tomcat并启动
+		Tomcat tomcat = new Tomcat();
+		File baseDir = (this.baseDirectory != null) ? this.baseDirectory : createTempDir("tomcat");
+		tomcat.setBaseDir(baseDir.getAbsolutePath());
+		Connector connector = new Connector(this.protocol);
+		connector.setThrowOnFailure(true);
+		tomcat.getService().addConnector(connector);
+		customizeConnector(connector);
+		tomcat.setConnector(connector);
+		tomcat.getHost().setAutoDeploy(false);
+		configureEngine(tomcat.getEngine());
+		for (Connector additionalConnector : this.additionalTomcatConnectors) {
+			tomcat.getService().addConnector(additionalConnector);
+		}
+		prepareContext(tomcat.getHost(), initializers);
+		return getTomcatWebServer(tomcat);
+	}
+```
 
 ## 9、使用外置的Servlet容器
 
@@ -3500,47 +4081,64 @@ https://hub.docker.com/
 
 ````shell
 1、搜索镜像
-[root@localhost ~]# docker search tomcat
+docker search tomcat
+
 2、拉取镜像
-[root@localhost ~]# docker pull tomcat
+docker pull tomcat
+
 3、根据镜像启动容器
 docker run --name mytomcat -d tomcat:latest
-4、docker ps  
-查看运行中的容器
+
+4、查看运行中的容器
+docker ps  
+
 5、 停止运行中的容器
 docker stop  容器的id
+
 6、查看所有的容器
 docker ps -a
+
 7、启动容器
 docker start 容器id
+-d：后台运行
+-p：将主机的端口映射到容器的一个端口    主机端口:容器内部的端口
+-e：设置环境变量
+--name：设置容器名
+---restart：重启规则  
+		--restart=unless-stopped	表示docker启动时该容器自启
+		
+启动一个做了端口映射的tomcat，设置其root密码为123456，且docker启动自启
+docker run --name mysql01 -e MYSQL_ROOT_PASSWORD=123456 -p 3306:3306  -d --restart=unless-stopped 413be204e9c3
+
+
 8、删除一个容器
  docker rm 容器id
-9、启动一个做了端口映射的tomcat
-[root@localhost ~]# docker run -d -p 8888:8080 tomcat
--d：后台运行
--p: 将主机的端口映射到容器的一个端口    主机端口:容器内部的端口
+ 
 
 10、为了演示简单关闭了linux的防火墙
 service firewalld status ；查看防火墙状态
 service firewalld stop：关闭防火墙
+
 11、查看容器的日志
 docker logs container-name/container-id
+
+12、进入容器内
+docker exec -ti 容器ID /bin/bash
 
 更多命令参看
 https://docs.docker.com/engine/reference/commandline/docker/
 可以参考每一个镜像的文档
-
 ````
 
+tomcat启动后访问主页后出现404
 
+[解决方案](https://p1htmlkernalweb.mybluemix.net/articles/Docker%E5%AE%B9%E5%99%A8%E5%90%AF%E5%8A%A8tomcat%2C%E8%AE%BF%E9%97%AE%E9%A6%96%E9%A1%B5%E5%87%BA%E7%8E%B0404%E9%94%99%E8%AF%AF_3722776_csdn.html)
 
 ### 3）、安装MySQL示例
 
 ```shell
 docker pull mysql
 ```
-
-
 
 错误的启动
 
@@ -3559,6 +4157,7 @@ c4f1ac60b3fc        tomcat              "catalina.sh run"        About an hour a
 
 
 //错误日志
+//要指定mysql密码
 [root@localhost ~]# docker logs 42f09819908b
 error: database is uninitialized and password option is not specified 
   You need to specify one of MYSQL_ROOT_PASSWORD, MYSQL_ALLOW_EMPTY_PASSWORD and MYSQL_RANDOM_ROOT_PASSWORD；这个三个参数必须指定一个
@@ -3599,12 +4198,65 @@ docker run --name some-mysql -e MYSQL_ROOT_PASSWORD=my-secret-pw -d mysql:tag --
 
 
 
+#### 如何使用官方镜像
+
+Docker 中国官方镜像加速可通过 registry.docker-cn.com 访问。目前该镜像库只包含流行的公有镜像，而私有镜像仍需要从美国镜像库中拉取。
+
+可以使用以下命令直接从该镜像加速地址进行拉取。
+
+
+
+```undefined
+docker pull registry.docker-cn.com/myname/myrepo:mytag
+```
+
+示例如下：
+
+```dart
+docker pull registry.docker-cn.com/library/ubuntu:16.04
+```
+
+> 注:除非您修改了Docker守护进程的–registry-mirror参数,否则您将需要完整地指定官方镜像的名称。例如，library/ubuntu、library/redis、library/nginx。
+
+#### 给Docker守护进程配置加速器
+
+通过配置文件启动Docker,修改`/etc/docker/daemon.json` 文件并添加上 registry-mirrors 键值。
+
+
+
+```undefined
+sudo vim /etc/docker/daemon.json
+```
+
+
+
+```json
+{
+ "registry-mirrors": ["https://registry.docker-cn.com"]
+}
+```
+
+> 也可选用网易的镜像地址：http://hub-mirror.c.163.com
+>  {
+>  "registry-mirrors": ["http://hub-mirror.c.163.com"]
+>  }
+
+修改保存后，重启 Docker 以使配置生效。
+
+
+
+```undefined
+sudo service docker restart
+```
+
+
+
 # 六、SpringBoot与数据访问
 
 ## 1、JDBC
 
 ```xml
-<dependency>
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-jdbc</artifactId>
 		</dependency>
@@ -3621,14 +4273,15 @@ docker run --name some-mysql -e MYSQL_ROOT_PASSWORD=my-secret-pw -d mysql:tag --
 spring:
   datasource:
     username: root
-    password: 123456
-    url: jdbc:mysql://192.168.15.22:3306/jdbc
+    password: 123
+   	# 在url之后要加上时区信息，否则会报错(mysql版本高对安全校验的提高)
+    url: jdbc:mysql://127.0.0.1:3306/springboot?serverTimezone=Asia/Shanghai
     driver-class-name: com.mysql.jdbc.Driver
 ```
 
 效果：
 
-​	默认是用org.apache.tomcat.jdbc.pool.DataSource作为数据源；
+​	2.2.5版本默认是用com.zaxxer.hikari.HikariDataSource作为数据源；
 
 ​	数据源的相关配置都在DataSourceProperties里面；
 
@@ -3647,29 +4300,79 @@ org.apache.tomcat.jdbc.pool.DataSource、HikariDataSource、BasicDataSource、
 3、自定义数据源类型
 
 ```java
-/**
- * Generic DataSource configuration.
- */
-@ConditionalOnMissingBean(DataSource.class)
-@ConditionalOnProperty(name = "spring.datasource.type")
-static class Generic {
 
-   @Bean
-   public DataSource dataSource(DataSourceProperties properties) {
-       //使用DataSourceBuilder创建数据源，利用反射创建响应type的数据源，并且绑定相关属性
-      return properties.initializeDataSourceBuilder().build();
-   }
+	/**
+	 * Generic DataSource configuration.
+	 */
+	@Configuration(proxyBeanMethods = false)
+	@ConditionalOnMissingBean(DataSource.class)
+	@ConditionalOnProperty(name = "spring.datasource.type")
+	static class Generic {
 
-}
+		@Bean
+		DataSource dataSource(DataSourceProperties properties) {
+             //使用DataSourceBuilder创建数据源，利用反射创建响应type的数据源，并且绑定相关属性
+			return properties.initializeDataSourceBuilder().build();
+		}
+
+	}
 ```
 
 4、**DataSourceInitializer：ApplicationListener**；
 
 ​	作用：
 
-​		1）、runSchemaScripts();运行建表语句；
+​		1）、createSchema();运行建表语句；
 
 ​		2）、runDataScripts();运行插入数据的sql语句；
+
+```java
+boolean createSchema() {
+    	//向getScripts()传入参数fallback="schema"
+		List<Resource> scripts = getScripts("spring.datasource.schema", this.properties.getSchema(), "schema");
+		if (!scripts.isEmpty()) {
+			if (!isEnabled()) {
+				logger.debug("Initialization disabled (not running DDL scripts)");
+				return false;
+			}
+			String username = this.properties.getSchemaUsername();
+			String password = this.properties.getSchemaPassword();
+			runScripts(scripts, username, password);
+		}
+		return !scripts.isEmpty();
+	}
+
+void initSchema() {
+    	//向getScripts()传入参数fallback="data"
+		List<Resource> scripts = getScripts("spring.datasource.data", this.properties.getData(), "data");
+		if (!scripts.isEmpty()) {
+			if (!isEnabled()) {
+				logger.debug("Initialization disabled (not running data scripts)");
+				return;
+			}
+			String username = this.properties.getDataUsername();
+			String password = this.properties.getDataPassword();
+			runScripts(scripts, username, password);
+		}
+	}
+
+	private List<Resource> getScripts(String propertyName, List<String> resources, String fallback) {
+		if (resources != null) {
+			return getResources(propertyName, resources, true);
+		}
+		String platform = this.properties.getPlatform();
+		List<String> fallbackResources = new ArrayList<>();
+        //createSchema()传入fallback="schema"，因此文件名为schema-all.sql/schema.sql
+        //initSchema()传入fallback="data"，因此文件名为data-all.sql/data.sql
+		fallbackResources.add("classpath*:" + fallback + "-" + platform + ".sql");
+		fallbackResources.add("classpath*:" + fallback + ".sql");
+		return getResources(propertyName, fallbackResources, false);
+	}
+
+x
+```
+
+
 
 默认只需要将文件命名为：
 
@@ -3680,23 +4383,82 @@ schema-*.sql、data-*.sql
 	schema:
       - classpath:department.sql
       指定位置
+#在2.2.x开启应用启动建表
+spring.datasource.initialization-mode=always
 ```
 
 5、操作数据库：自动配置了JdbcTemplate操作数据库
 
-## 2、整合Druid数据源
+JdbcTemplateAutoConfiguration导入了JdbcTemplateConfiguration类，而JdbcTemplateConfiguration类中向容器中添加了JdbcTemplate，因此我们可以使用JdbcTemplate操作数据库
 
-```xml
-<!-- https://mvnrepository.com/artifact/com.alibaba/druid -->
-<!-- 淘宝技术这十年有介绍过该连接池的前世今生 -->
-<dependency>
-    <groupId>com.alibaba</groupId>
-    <artifactId>druid</artifactId>
-    <version>1.1.19</version>
-</dependency>
+```java
+@Configuration(proxyBeanMethods = false)
+@ConditionalOnClass({ DataSource.class, JdbcTemplate.class })
+@ConditionalOnSingleCandidate(DataSource.class)
+@AutoConfigureAfter(DataSourceAutoConfiguration.class)
+@EnableConfigurationProperties(JdbcProperties.class)
+@Import({ JdbcTemplateConfiguration.class, NamedParameterJdbcTemplateConfiguration.class })
+public class JdbcTemplateAutoConfiguration {
+
+}
+
+@Configuration(proxyBeanMethods = false)
+@ConditionalOnMissingBean(JdbcOperations.class)
+class JdbcTemplateConfiguration {
+
+    //向容器中导入JdbcTemplate
+	@Bean
+	@Primary
+	JdbcTemplate jdbcTemplate(DataSource dataSource, JdbcProperties properties) {
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+		JdbcProperties.Template template = properties.getTemplate();
+		jdbcTemplate.setFetchSize(template.getFetchSize());
+		jdbcTemplate.setMaxRows(template.getMaxRows());
+		if (template.getQueryTimeout() != null) {
+			jdbcTemplate.setQueryTimeout((int) template.getQueryTimeout().getSeconds());
+		}
+		return jdbcTemplate;
+	}
+
+}
 ```
 
 
+
+## 2、整合Druid数据源
+
+配置
+
+```yaml
+spring:
+  datasource:
+    username: root
+    password: 123
+    url: jdbc:mysql://127.0.0.1:3306/springboot?serverTimezone=Asia/Shanghai
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+#    initialization-mode: always 开启启动建表
+
+    #   数据源其他配置
+    initialSize: 5
+    minIdle: 5
+    maxActive: 20
+    maxWait: 60000
+    timeBetweenEvictionRunsMillis: 60000
+    minEvictableIdleTimeMillis: 300000
+    validationQuery: SELECT 1 FROM DUAL
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    poolPreparedStatements: true
+    #   配置监控统计拦截的filters，去掉后监控界面sql无法统计，'wall'用于防火墙
+    filters: stat,wall,log4j
+    maxPoolPreparedStatementPerConnectionSize: 20
+    useGlobalDataSourceStat: true
+    connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=500
+```
+
+由于spring.datasource默认使用DataSourceProperties类进行配置，而DataSourceProperties中没有druid配置的各项属性，因此我们需要自定义配置类
 
 ```java
 导入druid数据源
@@ -3791,6 +4553,15 @@ public interface DepartmentMapper {
 
 自定义MyBatis的配置规则；给容器中添加一个ConfigurationCustomizer；
 
+比如支持驼峰命名法：
+
+```java
+  	@Select("SELECT * FROM department where id=#{id}")
+    Department getDeptById(Integer id);
+```
+
+在不定制的情况下,departmentName是封装不进去的
+
 ```java
 @org.springframework.context.annotation.Configuration
 public class MyBatisConfig {
@@ -3799,6 +4570,7 @@ public class MyBatisConfig {
     public ConfigurationCustomizer configurationCustomizer(){
         return new ConfigurationCustomizer(){
 
+            //开启驼峰命名法
             @Override
             public void customize(Configuration configuration) {
                 configuration.setMapUnderscoreToCamelCase(true);
@@ -3824,110 +4596,51 @@ public class SpringBoot06DataMybatisApplication {
 
 ### 5）、配置文件版
 
+配置文件可与注解同时生效，但相关配置(如驼峰命名法)需要单独各自配置
+
+mybatis-config.xml
+
+```xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <settings>
+        <!--指定开启驼峰命名法-->
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+    </settings>
+</configuration>
+```
+
+EmployeeMapper.xml
+
+```xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.ustc.springboot.mapper.EmployeeMapper">
+    <select id="getEmpById" resultType="cn.edu.ustc.springboot.bean.Employee">
+        select * from employee where id = #{id}
+    </select>
+    <insert id="insertEmp">
+        INSERT INTO employee(lastName,gender,email,d_id) VALUES (#{lastName},#{gender},#{email},#{dId})
+    </insert>
+</mapper>
+```
+
 ```yaml
 mybatis:
   config-location: classpath:mybatis/mybatis-config.xml 指定全局配置文件的位置
   mapper-locations: classpath:mybatis/mapper/*.xml  指定sql映射文件的位置
 ```
 
+
+
 更多使用参照
 
 http://www.mybatis.org/spring-boot-starter/mybatis-spring-boot-autoconfigure/
-
-
-
-
-
-### 6)、Mapper版
-
-/src/main/java/com/guigu/springboot/mapper/EmployeeMapper.java
-
-```java
-package com.guigu.springboot.mapper;
-
-import com.guigu.springboot.bean.Employee;
-
-/**
- * @author: kaiyi
- * @create: 2020-08-05 22:54
- */
-
-// @Mapper或者@MapperScan将接口扫描装配到容器中
-public interface EmployeeMapper {
-  public Employee getEmpById(Integer id);
-
-  public void insertEmp(Employee employee);
-
-}
-
-```
-
-
-
-src/main/resources/mybatis/mapper/EmployeeMapper.xml
-
-```xml
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper
-  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-
-<mapper namespace="com.guigu.springboot.mapper.EmployeeMapper">
-
-  <select id="getEmpById" resultType="com.guigu.springboot.bean.Employee">
-    SELECT * FROM employee WHERE id=#{id}
-  </select>
-
-  <insert id="insertEmp">
-    INSERT INTO employee(lastName,email,gender,d_id) VALUES (#{lastName},#{email},#{gender},#{dId})
-  </insert>
-
-</mapper>
-```
-
-
-
-DeptController.java 调用测试
-
-```java
-/**
- * @author: kaiyi
- * @create: 2020-08-05 23:42
- */
-
-@RestController
-public class DeptController {
-  //@Autowired
-  //DepartmentMapper departmentMapper;
-
-  @Autowired
-  EmployeeMapper employeeMapper;
-
-  @GetMapping("/emp/{id}")
-  public Employee getEmp(@PathVariable("id") Integer id){
-    return employeeMapper.getEmpById(id);
-  }
-
-}
-```
-
-
-
-浏览器访问：http://localhost:8080/emp/1
-
-返回结果：
-
-```json
-{
-    "id": 1,
-    "lastName": "lily",
-    "gender": 0,
-    "email": "support@quantsmart.com",
-    "dId": 1
-}
-```
-
-
 
 
 
@@ -3971,12 +4684,17 @@ public interface UserRepository extends JpaRepository<User,Integer> {
 3）、基本的配置JpaProperties
 
 ```yaml
-spring:  
- jpa:
+spring:
+  datasource:
+    username: root
+    password: 123
+    url: jdbc:mysql://localhost:3306/springboot?serverTimezone=Asia/Shanghai
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    #开启自动创建表或更新
     hibernate:
-#     更新或者创建数据表结构
       ddl-auto: update
-#    控制台显示SQL
+    #开启打印sql语句
     show-sql: true
 ```
 
@@ -4006,31 +4724,19 @@ spring:
 
 ## **1、创建SpringApplication对象**
 
-spring-boot-2.3.2.RELEASE.jar!/org/springframework/boot/SpringApplication.class
-
 ```java
-public static ConfigurableApplicationContext run(Class<?> primarySource, String... args) {
-    return run(new Class[]{primarySource}, args);
-  }
-```
-
-
-
-```java
-initialize(sources);
-private void initialize(Object[] sources) {
+public SpringApplication(ResourceLoader resourceLoader, Class<?>... primarySources) {
+    this.resourceLoader = resourceLoader;
+    Assert.notNull(primarySources, "PrimarySources must not be null");
     //保存主配置类
-    if (sources != null && sources.length > 0) {
-        this.sources.addAll(Arrays.asList(sources));
-    }
-    //判断当前是否一个web应用
-    this.webEnvironment = deduceWebEnvironment();
+    this.primarySources = new LinkedHashSet<>(Arrays.asList(primarySources));
+    //判断当前web应用类型(REACTIVE/SERVLET/NONE即非web)
+    this.webApplicationType = WebApplicationType.deduceFromClasspath();
     //从类路径下找到META-INF/spring.factories配置的所有ApplicationContextInitializer；然后保存起来
-    setInitializers((Collection) getSpringFactoriesInstances(
-        ApplicationContextInitializer.class));
+    setInitializers((Collection) getSpringFactoriesInstances(ApplicationContextInitializer.class));
     //从类路径下找到ETA-INF/spring.factories配置的所有ApplicationListener
     setListeners((Collection) getSpringFactoriesInstances(ApplicationListener.class));
-    //从多个配置类中找到有main方法的主配置类
+      //从多个配置类中找到有main方法的主配置类
     this.mainApplicationClass = deduceMainApplicationClass();
 }
 ```
@@ -4043,59 +4749,61 @@ private void initialize(Object[] sources) {
 
 ```java
 public ConfigurableApplicationContext run(String... args) {
-   StopWatch stopWatch = new StopWatch();
-   stopWatch.start();
-   ConfigurableApplicationContext context = null;
-   FailureAnalyzers analyzers = null;
-   configureHeadlessProperty();
-    
-   //获取SpringApplicationRunListeners；从类路径下META-INF/spring.factories
-   SpringApplicationRunListeners listeners = getRunListeners(args);
+    StopWatch stopWatch = new StopWatch();
+    stopWatch.start();
+    ConfigurableApplicationContext context = null;
+    Collection<SpringBootExceptionReporter> exceptionReporters = new ArrayList<>();
+    configureHeadlessProperty();
+    //获取SpringApplicationRunListeners；从类路径下META-INF/spring.factories
+    SpringApplicationRunListeners listeners = getRunListeners(args);
     //回调所有的获取SpringApplicationRunListener.starting()方法
-   listeners.starting();
-   try {
-       //封装命令行参数
-      ApplicationArguments applicationArguments = new DefaultApplicationArguments(
-            args);
-      //准备环境
-      ConfigurableEnvironment environment = prepareEnvironment(listeners,
-            applicationArguments);
-       		//创建环境完成后回调SpringApplicationRunListener.environmentPrepared()；表示环境准备完成
-       
-      Banner printedBanner = printBanner(environment);
-       
-       //创建ApplicationContext；决定创建web的ioc还是普通的ioc
-      context = createApplicationContext();
-       
-      analyzers = new FailureAnalyzers(context);
-       //准备上下文环境;将environment保存到ioc中；而且applyInitializers()；
-       //applyInitializers()：回调之前保存的所有的ApplicationContextInitializer的initialize方法
-       //回调所有的SpringApplicationRunListener的contextPrepared()；
-       //
-      prepareContext(context, environment, listeners, applicationArguments,
-            printedBanner);
-       //prepareContext运行完成以后回调所有的SpringApplicationRunListener的contextLoaded（）；
-       
-       //s刷新容器；ioc容器初始化（如果是web应用还会创建嵌入式的Tomcat）；Spring注解版
-       //扫描，创建，加载所有组件的地方；（配置类，组件，自动配置）
-      refreshContext(context);
-       //从ioc容器中获取所有的ApplicationRunner和CommandLineRunner进行回调
-       //ApplicationRunner先回调，CommandLineRunner再回调
-      afterRefresh(context, applicationArguments);
-       //所有的SpringApplicationRunListener回调finished方法
-      listeners.finished(context, null);
-      stopWatch.stop();
-      if (this.logStartupInfo) {
-         new StartupInfoLogger(this.mainApplicationClass)
-               .logStarted(getApplicationLog(), stopWatch);
-      }
-       //整个SpringBoot应用启动完成以后返回启动的ioc容器；
-      return context;
-   }
-   catch (Throwable ex) {
-      handleRunFailure(context, listeners, analyzers, ex);
-      throw new IllegalStateException(ex);
-   }
+    listeners.starting();
+    try {
+        //封装命令行参数
+        ApplicationArguments applicationArguments = new DefaultApplicationArguments(args);
+        //准备环境
+        //创建环境完成后回调SpringApplicationRunListener.environmentPrepared()；表示环境准备完成
+        ConfigurableEnvironment environment = prepareEnvironment(listeners, applicationArguments);
+        configureIgnoreBeanInfo(environment);
+        Banner printedBanner = printBanner(environment);
+        //创建ApplicationContext；根据webApplicationType创建SERVLET/REACTIVE/普通容器
+        context = createApplicationContext();
+        //获取SpringBootExceptionReporter；从类路径下META-INF/spring.factories
+        exceptionReporters = getSpringFactoriesInstances(SpringBootExceptionReporter.class,
+                          new Class[] {	ConfigurableApplicationContext.class }, context);
+        //准备上下文环境;将environment保存到ioc中；而且applyInitializers()；
+        //applyInitializers()：回调之前保存的所有的ApplicationContextInitializer的initialize方法
+        //回调所有的SpringApplicationRunListener的contextPrepared()；
+        //prepareContext运行完成以后回调所有的SpringApplicationRunListener的contextLoaded（）；
+        prepareContext(context, environment, listeners, applicationArguments, printedBanner);
+        //刷新容器；ioc容器初始化（如果是Servlet应用还会创建嵌入式的Tomcat并启动）；
+        //扫描，创建，加载所有组件的地方；（配置类，组件，自动配置）
+        refreshContext(context);
+        afterRefresh(context, applicationArguments);
+        stopWatch.stop();
+        if (this.logStartupInfo) {
+            new StartupInfoLogger(this.mainApplicationClass).logStarted(getApplicationLog(), stopWatch);
+        }
+        //回调所有的获取SpringApplicationRunListener.started()方法
+        listeners.started(context);
+        //从容器中分别获取ApplicationRunner和CommandLineRunner并调用其回调方法胜
+        //ApplicationRunner先回调，CommandLineRunner再回调
+        callRunners(context, applicationArguments);
+    }
+    catch (Throwable ex) {
+        handleRunFailure(context, ex, exceptionReporters, listeners);
+        throw new IllegalStateException(ex);
+    }
+
+    try {
+        //回调所有的获取SpringApplicationRunListener.running()方法
+        listeners.running(context);
+    }
+    catch (Throwable ex) {
+        handleRunFailure(context, ex, exceptionReporters, null);
+        throw new IllegalStateException(ex);
+    }
+    return context;
 }
 ```
 
@@ -4205,8 +4913,6 @@ starter：
 ​	1、这个场景需要使用到的依赖是什么？
 
 ​	2、如何编写自动配置
-
-​        以 WebMvcAutoConfiguration.class 为例
 
 ```java
 @Configuration  //指定这个类是一个配置类
@@ -4406,3 +5112,4 @@ https://github.com/spring-projects/spring-boot/tree/master/spring-boot-samples
 
 
 
+ 
